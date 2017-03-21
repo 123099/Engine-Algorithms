@@ -1,0 +1,8 @@
+DONE: GetIndex return by lambda initialization vs return by variable
+Split retrieve node bounds center once vs retrieve bounds center in every calculation
+Split pre-calculate child layer vs calculate layer every calculation
+Split when max object count reached vs always split
+Maximum layer count vs unlimited potential layers
+GameObject get world position
+IsSplit checking whether a node is not null vs caching a boolean value
+Marking variables const vs no const
