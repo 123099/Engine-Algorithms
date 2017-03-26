@@ -97,15 +97,11 @@ void OcTreeFinal::RetrieveObjectsInSpaceOf(std::vector<GameObject*>& returnList,
 		}
 	}
 
+	//Reserve space in the vector for the objects to be added
+	returnList.reserve(returnList.size() + m_gameObjects.size());
+
 	//Add all of our objects to the return list, since the objects in our node may collide with any of the objects in the children nodes
 	returnList.insert(returnList.end(), m_gameObjects.begin(), m_gameObjects.end());
-
-	//If the return list contains the provided game object, remove it from the list to avoid collision with itself
-	const auto foundGameObjectIterator = std::find(returnList.begin(), returnList.end(), gameObject);
-	if (foundGameObjectIterator != returnList.end())
-	{
-		returnList.erase(foundGameObjectIterator);
-	}
 }
 
 //TODO: Possible optimization - child nodes don't need to be cleared, since they will be destroyed and the destructor will clear it

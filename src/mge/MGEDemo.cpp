@@ -29,14 +29,12 @@ using namespace std;
 #include "mge/MGEDemo.hpp"
 
 #include "Engine Algorithms\OcTreeBase.hpp"
+#include "Engine Algorithms\OcTreeFinal.hpp"
 
 MGEDemo::MGEDemo()
 {
-#ifdef FINAL_DEMO
 	m_octree = new OcTreeFinal(0, glm::vec3(0.0f), glm::vec3(10.0f));
-#else
-	m_octree = new OcTreeBase(0, glm::vec3(0.0f), glm::vec3(10.0f));
-#endif
+	//m_octree = new OcTreeBase(0, glm::vec3(0.0f), glm::vec3(10.0f));
 }
 
 void MGEDemo::initialize() 
@@ -55,7 +53,7 @@ void MGEDemo::_initializeScene()
 {
     _renderer->setClearColor(0,0,0);
 
-	Test(1000);
+	Test(10000);
 }
 
 float timePassed = 0.0f;
@@ -71,7 +69,10 @@ void MGEDemo::_update(float deltaTime)
 	std::vector<GameObject*> retrieved;
 	//Fake collision loop
 	for (int i = 0; i < _world->getChildCount(); ++i)
+	{
+		retrieved.clear();
 		m_octree->RetrieveObjectsInSpaceOf(retrieved, _world->getChildAt(i));
+	}
 
 	AbstractGame::_update(deltaTime);
 

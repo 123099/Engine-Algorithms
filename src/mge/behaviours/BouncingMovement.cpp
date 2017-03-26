@@ -9,7 +9,7 @@ BouncingMovement::BouncingMovement(float range) : m_range(range)
 
 void BouncingMovement::update(float deltaTime)
 {
-	const glm::vec3 position = _owner->getWorldPosition();
+	const glm::vec3& position = _owner->getLocalPosition();
 
 	if (position.x > m_range || position.x < -m_range)
 		m_movementDirection.x *= -1;
@@ -19,6 +19,6 @@ void BouncingMovement::update(float deltaTime)
 
 	if (position.z > m_range || position.z < -m_range)
 		m_movementDirection.z *= -1;
-
+	
 	_owner->translate(m_movementDirection * deltaTime * 5.0f);
 }
