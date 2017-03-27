@@ -131,7 +131,8 @@ void MGEDemo::Test(unsigned objectCount)
 	//SCENE SETUP
 	for (unsigned i = 0; i < objectCount; ++i)
 	{
-		GameObject* teapot = new GameObject("teapot", glm::vec3(-3, 1.2f, 1));
+		glm::vec3 position = (glm::vec3((float)std::rand(), (float)std::rand(), (float)std::rand()) / glm::vec3(RAND_MAX) - glm::vec3(0.5f)) * 2.0f * 20.0f;
+		GameObject* teapot = new GameObject("teapot", position);
 		teapot->setMesh(teapotMeshS);
 		teapot->setMaterial(textureMaterial2);
 		teapot->setBehaviour(new BouncingMovement(20.0f));

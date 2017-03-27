@@ -170,7 +170,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Engine Algorithms\AABB.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\Bounds.hpp" />
+    <ClInclude Include="..\src\Engine Algorithms\Collider.hpp" />
+    <ClInclude Include="..\src\Engine Algorithms\OBB.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\OcTreeBase.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\OcTreeFinal.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\OcTreeImpl.hpp" />
@@ -197,7 +200,10 @@
     <ClInclude Include="..\src\mge\util\DebugHud.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Engine Algorithms\AABB.cpp" />
     <ClCompile Include="..\src\Engine Algorithms\Bounds.cpp" />
+    <ClCompile Include="..\src\Engine Algorithms\Collider.cpp" />
+    <ClCompile Include="..\src\Engine Algorithms\OBB.cpp" />
     <ClCompile Include="..\src\Engine Algorithms\OcTreeBase.cpp" />
     <ClCompile Include="..\src\Engine Algorithms\OcTreeFinal.cpp" />
     <ClCompile Include="..\src\main.cpp" />
