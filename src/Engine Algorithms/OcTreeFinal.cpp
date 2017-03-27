@@ -184,64 +184,55 @@ int OcTreeFinal::GetNodeIndex(GameObject * gameObject)
 	//If the object is exactly on one of the edges of this node, then it doesn't fit in any child node
 	const Bounds& objectBounds = gameObject->GetBounds();
 	const glm::vec3& objectExtents = objectBounds.GetExtents();
-	const glm::vec3& objectPosition = gameObject->getLocalPosition() + objectBounds.GetCenter();
+	const glm::vec3 objectPosition = gameObject->getLocalPosition() + objectBounds.GetCenter();
 	const glm::vec3& nodeCenter = m_bounds.GetCenter();
 
-	const bool isInLeftHalf = objectPosition.x + objectExtents.x < nodeCenter.x;
-	const bool isInRightHalf = objectPosition.x - objectExtents.x > nodeCenter.x;
-
-	const bool isInBottomHalf = objectPosition.y + objectExtents.y < nodeCenter.y;
-	const bool isInTopHalf = objectPosition.y - objectExtents.y > nodeCenter.y;
-
-	const bool isInFrontHalf = objectPosition.z + objectExtents.z < nodeCenter.z;
-	const bool isInBackHalf = objectPosition.z - objectExtents.z > nodeCenter.z;
-
 	//Determine the node index based on the location of the object in our space
-	if (isInTopHalf == true)
+	if (objectPosition.y - objectExtents.y > nodeCenter.y ) //Top
 	{
-		if (isInFrontHalf == true)
+		if (objectPosition.z + objectExtents.z < nodeCenter.z ) //Front
 		{
-			if (isInRightHalf == true)		//Top 1st quadrant
+			if (objectPosition.x - objectExtents.x > nodeCenter.x ) //Right	//Top 1st quadrant
 			{
 				return 0;
 			}
-			else if (isInLeftHalf == true)	//Top 2nd quadrant
+			else if (objectPosition.x + objectExtents.x < nodeCenter.x ) //Left	//Top 2nd quadrant
 			{
 				return 1;
 			}
 		}
-		else if (isInBackHalf == true)
+		else if (objectPosition.z - objectExtents.z > nodeCenter.z ) //Back
 		{
-			if (isInLeftHalf == true)		//Top 3rd quadrant
+			if (objectPosition.x + objectExtents.x < nodeCenter.x )	//Left	//Top 3rd quadrant
 			{
 				return 2;
 			}
-			else if (isInRightHalf == true)	//Top 4th quadrant
+			else if (objectPosition.x - objectExtents.x > nodeCenter.x ) //Right	//Top 4th quadrant
 			{
 				return 3;
 			}
 		}
 	}
-	else if (isInBottomHalf)
+	else if (objectPosition.y + objectExtents.y < nodeCenter.y) //Bottom
 	{
-		if (isInFrontHalf == true)
+		if (objectPosition.z + objectExtents.z < nodeCenter.z ) //Front
 		{
-			if (isInRightHalf == true)		//Bottom 1st quadrant
+			if (objectPosition.x - objectExtents.x > nodeCenter.x )	//Right	//Bottom 1st quadrant
 			{
 				return 4;
 			}
-			else if (isInLeftHalf == true)	//Bottom 2nd quadrant
+			else if (objectPosition.x + objectExtents.x < nodeCenter.x ) //Left	//Bottom 2nd quadrant
 			{
 				return 5;
 			}
 		}
-		else if (isInBackHalf == true)
+		else if (objectPosition.z - objectExtents.z > nodeCenter.z ) //Back
 		{
-			if (isInLeftHalf == true)		//Bottom 3rd quadrant
+			if (objectPosition.x + objectExtents.x < nodeCenter.x )	//Left	//Bottom 3rd quadrant
 			{
 				return 6;
 			}
-			else if (isInRightHalf == true)	//Bottom 4th quadrant
+			else if (objectPosition.x - objectExtents.x > nodeCenter.x ) //Right	//Bottom 4th quadrant
 			{
 				return 7;
 			}
