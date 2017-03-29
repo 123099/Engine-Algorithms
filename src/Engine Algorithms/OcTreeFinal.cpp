@@ -179,22 +179,21 @@ std::string OcTreeFinal::ToString()
 
 int OcTreeFinal::GetNodeIndex(GameObject * gameObject)
 {
-	//TODO: game object Get World Position makes it SUPER slow
 	//Determine where the object is in the node's space, looking towards the negative z axis
 	//If the object is exactly on one of the edges of this node, then it doesn't fit in any child node
 	const Bounds& objectBounds = gameObject->GetBounds();
-	const glm::vec3& objectExtents = objectBounds.GetExtents();
-	const glm::vec3 objectPosition = gameObject->getLocalPosition() + objectBounds.GetCenter();
+	const glm::vec3 objectBoundsMin = objectBounds.GetMinimum();
+	const glm::vec3 objectBoundsMax = objectBounds.GetMaximum();
 	const glm::vec3& nodeCenter = m_bounds.GetCenter();
 
-	const bool isInLeftHalf = objectPosition.x + objectExtents.x < nodeCenter.x;
-	const bool isInRightHalf = objectPosition.x - objectExtents.x > nodeCenter.x;
+	const bool isInLeftHalf = objectBoundsMax.x < nodeCenter.x;
+	const bool isInRightHalf = objectBoundsMin.x > nodeCenter.x;
 
-	const bool isInBottomHalf = objectPosition.y + objectExtents.y < nodeCenter.y;
-	const bool isInTopHalf = objectPosition.y - objectExtents.y > nodeCenter.y;
+	const bool isInBottomHalf = objectBoundsMax.y < nodeCenter.y;
+	const bool isInTopHalf = objectBoundsMin.y > nodeCenter.y;
 
-	const bool isInFrontHalf = objectPosition.z + objectExtents.z < nodeCenter.z;
-	const bool isInBackHalf = objectPosition.z - objectExtents.z > nodeCenter.z;
+	const bool isInFrontHalf = objectBoundsMax.z < nodeCenter.z;
+	const bool isInBackHalf = objectBoundsMin.z > nodeCenter.z;
 
 	//Determine the node index based on the location of the object in our space
 	if (isInTopHalf == true)

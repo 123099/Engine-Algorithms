@@ -6,6 +6,7 @@
 #include <iostream>
 #include <glm.hpp>
 #include "Engine Algorithms\Bounds.hpp"
+#include "Engine Algorithms\Collider.hpp"
 
 class AbstractBehaviour;
 class AbstractMaterial;
@@ -56,6 +57,9 @@ class GameObject
 		void setBehaviour(AbstractBehaviour* pBehaviour);
 		AbstractBehaviour* getBehaviour() const;
 
+		void SetCollider(Collider* collider);
+		Collider* GetCollider() const;
+
 		virtual void update(float pStep);
 
         //child management
@@ -77,6 +81,7 @@ class GameObject
 		glm::vec3 m_localPosition;
 
 		Bounds m_bounds;
+		Collider* m_collider;
 
         GameObject* _parent;
 		std::vector<GameObject*> _children;
@@ -90,8 +95,8 @@ class GameObject
 		void _innerRemove (GameObject* pChild);
 
     private:
-        GameObject(const GameObject&);
-        GameObject& operator=(const GameObject&);
+        GameObject(const GameObject&) = delete;
+        GameObject& operator=(const GameObject&) = delete;
 };
 
 #endif // GAMEOBJECT_H

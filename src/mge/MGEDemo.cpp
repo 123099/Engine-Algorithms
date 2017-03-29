@@ -31,9 +31,12 @@ using namespace std;
 #include "Engine Algorithms\OcTreeBase.hpp"
 #include "Engine Algorithms\OcTreeFinal.hpp"
 
+#include "Engine Algorithms\AABB.hpp"
+#include "Engine Algorithms\OBB.hpp"
+
 MGEDemo::MGEDemo()
 {
-	m_octree = new OcTreeFinal(0, glm::vec3(0.0f), glm::vec3(10.0f));
+	m_octree = new OcTreeFinal(0, glm::vec3(0.0f), glm::vec3(50.0f));
 	//m_octree = new OcTreeBase(0, glm::vec3(0.0f), glm::vec3(10.0f));
 }
 
@@ -66,12 +69,26 @@ void MGEDemo::_update(float deltaTime)
 
 	UpdateOcTree();
 
+	//Collisions
 	std::vector<GameObject*> retrieved;
-	//Fake collision loop
 	for (int i = 0; i < _world->getChildCount(); ++i)
 	{
 		retrieved.clear();
-		m_octree->RetrieveObjectsInSpaceOf(retrieved, _world->getChildAt(i));
+
+		GameObject* oneObject = _world->getChildAt(i);
+		m_octree->RetrieveObjectsInSpaceOf(retrieved, oneObject);
+
+		/*for (size_t j = 0; j < retrieved.size(); ++j)
+		{
+			GameObject* otherObject = retrieved[j];
+			if (oneObject != otherObject &&
+				oneObject->GetCollider() != nullptr &&
+				otherObject->GetCollider() != nullptr &&
+				oneObject->GetCollider()->IsColliding(otherObject->GetCollider()))
+			{
+				std::cout << "Collision!" << '\n';
+			}
+		}*/
 	}
 
 	AbstractGame::_update(deltaTime);
@@ -131,11 +148,22 @@ void MGEDemo::Test(unsigned objectCount)
 	//SCENE SETUP
 	for (unsigned i = 0; i < objectCount; ++i)
 	{
-		glm::vec3 position = (glm::vec3((float)std::rand(), (float)std::rand(), (float)std::rand()) / glm::vec3(RAND_MAX) - glm::vec3(0.5f)) * 2.0f * 20.0f;
+		glm::vec3 position = (glm::vec3((float)std::rand(), (float)std::rand(), (float)std::rand()) / glm::vec3(RAND_MAX) - glm::vec3(0.5f)) * 2.0f * 100.0f;
 		GameObject* teapot = new GameObject("teapot", position);
 		teapot->setMesh(teapotMeshS);
 		teapot->setMaterial(textureMaterial2);
-		teapot->setBehaviour(new BouncingMovement(20.0f));
+		teapot->setBehaviour(new BouncingMovement(100.0f));
+
+		//Make half objects have AABB collider, and half an OBB
+		if (i % 2 == 0)
+		{
+			teapot->SetCollider(new OBB(glm::vec3(0.5f)));
+		}
+		else
+		{
+			teapot->SetCollider(new OBB(glm::vec3(0.5f)));
+		}
+
 		_world->add(teapot);
 	}
 

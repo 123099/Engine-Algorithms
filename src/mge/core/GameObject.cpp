@@ -6,9 +6,10 @@ using namespace std;
 #include "mge/core/Mesh.hpp"
 #include "mge/behaviours/AbstractBehaviour.hpp"
 
-GameObject::GameObject(std::string pName, glm::vec3 pPosition )
-:	_name( pName ), m_localPosition(pPosition),
-    _parent(NULL), _children(), _mesh( NULL ),_behaviour( NULL ), _material(NULL), m_bounds(glm::vec3(0.0f), glm::vec3(1.0f)) {}
+GameObject::GameObject(std::string pName, glm::vec3 pPosition ):
+	_name( pName ), m_localPosition(pPosition),
+    _parent(NULL), _children(), _mesh( NULL ),_behaviour( NULL ), _material(NULL),
+	m_bounds(glm::vec3(0.0f), glm::vec3(1.0f)), m_collider(nullptr) {}
 
 GameObject::~GameObject()
 {
@@ -22,6 +23,8 @@ GameObject::~GameObject()
     }
 
     //do not forget to delete behaviour, material, mesh, collider manually if required!
+	delete _behaviour;
+	delete m_collider;
 }
 
 void GameObject::setName (std::string pName)
@@ -84,6 +87,22 @@ void GameObject::setBehaviour(AbstractBehaviour* pBehaviour)
 AbstractBehaviour * GameObject::getBehaviour() const
 {
     return _behaviour;
+}
+
+void GameObject::SetCollider(Collider * collider)
+{
+	if (m_collider != nullptr)
+	{
+		m_collider->SetGameObject(nullptr);
+	}
+
+	m_collider = collider;
+	m_collider->SetGameObject(this);
+}
+
+Collider * GameObject::GetCollider() const
+{
+	return m_collider;
 }
 
 void GameObject::setParent (GameObject* pParent) {
@@ -180,6 +199,9 @@ void GameObject::update(float pStep)
     for (int i = _children.size()-1; i >= 0; --i ) {
         _children[i]->update(pStep);
     }
+
+	//TODO: Update bounds and collider position
+	m_bounds.SetCenter(m_localPosition);
 }
 
 int GameObject::getChildCount() {
