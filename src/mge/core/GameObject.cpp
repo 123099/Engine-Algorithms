@@ -200,8 +200,16 @@ void GameObject::update(float pStep)
         _children[i]->update(pStep);
     }
 
-	//TODO: Update bounds and collider position
 	m_bounds.SetCenter(m_localPosition);
+	if(m_collider) m_collider->SetCenter(m_localPosition);
+}
+
+void GameObject::OnCollision(Collider * other)
+{
+	if (_behaviour)
+	{
+		_behaviour->OnCollision(other);
+	}
 }
 
 int GameObject::getChildCount() {

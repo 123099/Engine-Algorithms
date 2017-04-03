@@ -24,8 +24,6 @@ const Bounds & Collider::GetBounds() const
 
 bool Collider::IsColliding(AABB * one, AABB * other)
 {
-	//std::cout << "AABB vs AABB" << '\n';
-
 	//Get the minimum and the maximum of both AABBs
 	const glm::vec3 oneMin = one->GetBounds().GetMinimum();
 	const glm::vec3 oneMax = one->GetBounds().GetMaximum();
@@ -40,21 +38,20 @@ bool Collider::IsColliding(AABB * one, AABB * other)
 
 bool Collider::IsColliding(AABB * one, OBB * other)
 {
-	//std::cout << "AABB vs OBB" << '\n';
-	return false;
+	return CheckCollisionsOnObjectPlanes(one, other, glm::mat3(), other->m_gameObject->getTransform());
 }
 
 bool Collider::IsColliding(OBB * one, OBB * other)
 {
-	//std::cout << "OBB vs OBB" << '\n';
+	return CheckCollisionsOnObjectPlanes(one, other, one->m_gameObject->getTransform(), other->m_gameObject->getTransform());
+}
 
-	const glm::mat4& oneTransform = one->m_gameObject->getTransform();
-	const glm::mat4& otherTransform = other->m_gameObject->getTransform();
-
+bool Collider::CheckCollisionsOnObjectPlanes(Collider* one, Collider* other, const glm::mat3 & onePlaneNormals, const glm::mat3 & otherPlaneNormals)
+{
 	//Check for overlap on the plane axes of each of the two objects
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		if (CheckOverlapOnPlane(one, other, oneTransform[i]) == false || CheckOverlapOnPlane(one, other, otherTransform[i]) == false)
+		if (CheckOverlapOnPlane(one, other, onePlaneNormals[i]) == false || CheckOverlapOnPlane(one, other, otherPlaneNormals[i]) == false)
 		{
 			return false;
 		}
@@ -63,10 +60,10 @@ bool Collider::IsColliding(OBB * one, OBB * other)
 	//Check for overlap on all the possible combinations of the axes of the two objects
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		const glm::vec3 oneAxis = oneTransform[i];
+		const glm::vec3& oneAxis = onePlaneNormals[i];
 		for (unsigned j = 0; j < 3; ++j)
 		{
-			const glm::vec3 combinedPlaneAxis = glm::cross(oneAxis, glm::vec3(otherTransform[j]));
+			const glm::vec3 combinedPlaneAxis = glm::cross(oneAxis, otherPlaneNormals[j]);
 
 			//Only check for overlap if the two axes of the two objects are not similar, meaning that the normal of the plane is longer than 0.1 units
 			if (glm::length2(combinedPlaneAxis) >= 0.01f)
@@ -92,8 +89,16 @@ bool Collider::CheckOverlapOnPlane(Collider* one, Collider* other, const glm::ve
 	const glm::mat4 otherExtents = glm::scale(other->m_gameObject->getTransform(), other->GetBounds().GetExtents());
 
 	//Get the distance between the center of the objects and its maximum point projected on the plane normal
-	const float radiusOne = std::abs(glm::dot(one->GetBounds().GetCenter() + glm::vec3(oneExtents[0]) + glm::vec3(oneExtents[1]) + glm::vec3(oneExtents[2]), planeNormal));
-	const float radiusTwo = std::abs(glm::dot(other->GetBounds().GetCenter() + glm::vec3(otherExtents[0]) + glm::vec3(otherExtents[1]) + glm::vec3(otherExtents[2]), planeNormal));
+	const float radiusOne =
+		std::abs(glm::dot(glm::vec3(oneExtents[0]), planeNormal)) +
+		std::abs(glm::dot(glm::vec3(oneExtents[1]), planeNormal)) +
+		std::abs(glm::dot(glm::vec3(oneExtents[2]), planeNormal));
+		//std::abs(glm::dot(glm::vec3(oneExtents[0]) + glm::vec3(oneExtents[1]) + glm::vec3(oneExtents[2]), planeNormal));
+	const float radiusTwo = 
+		std::abs(glm::dot(glm::vec3(otherExtents[0]), planeNormal)) +
+		std::abs(glm::dot(glm::vec3(otherExtents[1]), planeNormal)) +
+		std::abs(glm::dot(glm::vec3(otherExtents[2]), planeNormal));
+		//std::abs(glm::dot(glm::vec3(otherExtents[0]) + glm::vec3(otherExtents[1]) + glm::vec3(otherExtents[2]), planeNormal));
 
 	return radiusOne + radiusTwo > centerDistance;
 }

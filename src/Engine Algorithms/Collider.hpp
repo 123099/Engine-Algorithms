@@ -26,5 +26,6 @@ protected:
 	Bounds m_bounds;			//The bounds defining the position and size of this collider
 	GameObject* m_gameObject;	//The game object that owns this collider
 private:
+	static bool CheckCollisionsOnObjectPlanes(Collider* one, Collider* other, const glm::mat3& onePlaneNormals, const glm::mat3& otherPlaneNormals);
 	static bool CheckOverlapOnPlane(Collider* one, Collider* other, const glm::vec3& planeNormal);
 };

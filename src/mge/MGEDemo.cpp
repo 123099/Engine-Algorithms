@@ -78,7 +78,7 @@ void MGEDemo::_update(float deltaTime)
 		GameObject* oneObject = _world->getChildAt(i);
 		m_octree->RetrieveObjectsInSpaceOf(retrieved, oneObject);
 
-		/*for (size_t j = 0; j < retrieved.size(); ++j)
+		for (size_t j = 0; j < retrieved.size(); ++j)
 		{
 			GameObject* otherObject = retrieved[j];
 			if (oneObject != otherObject &&
@@ -86,9 +86,10 @@ void MGEDemo::_update(float deltaTime)
 				otherObject->GetCollider() != nullptr &&
 				oneObject->GetCollider()->IsColliding(otherObject->GetCollider()))
 			{
-				std::cout << "Collision!" << '\n';
+				oneObject->OnCollision(otherObject->GetCollider());
+				otherObject->OnCollision(oneObject->GetCollider());
 			}
-		}*/
+		}
 	}
 
 	AbstractGame::_update(deltaTime);
@@ -121,7 +122,7 @@ void MGEDemo::_update(float deltaTime)
 
 void MGEDemo::_render() {
     AbstractGame::_render();
-	m_octree->Draw(glm::inverse(_world->getMainCamera()->getWorldTransform()), _world->getMainCamera()->getProjection());
+	//m_octree->Draw(glm::inverse(_world->getMainCamera()->getWorldTransform()), _world->getMainCamera()->getProjection());
     _updateHud();
 }
 
@@ -130,10 +131,11 @@ void MGEDemo::Test(unsigned objectCount)
 	std::cout << "Starting testset " << objectCount << '\n';
 
 	//add camera first (it will be updated last)
-	Camera* camera = new Camera("camera", glm::vec3(0, 40, 40));
+	Camera* camera = new Camera("camera", glm::vec3(0, 150, 150));
 	camera->rotate(glm::radians(-40.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	FreeLookCamera* fc = new FreeLookCamera(*_window);
-	fc->SetMoveSpeed(2);
+	fc->SetMoveSpeed(4);
+	fc->SetRotationSpeed(0.005f);
 	camera->setBehaviour(fc);
 	_world->add(camera);
 	_world->setMainCamera(camera);
@@ -157,7 +159,7 @@ void MGEDemo::Test(unsigned objectCount)
 		//Make half objects have AABB collider, and half an OBB
 		if (i % 2 == 0)
 		{
-			teapot->SetCollider(new OBB(glm::vec3(0.5f)));
+			teapot->SetCollider(new AABB(glm::vec3(0.5f)));
 		}
 		else
 		{

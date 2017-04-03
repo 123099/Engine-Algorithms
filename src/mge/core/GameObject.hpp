@@ -61,6 +61,7 @@ class GameObject
 		Collider* GetCollider() const;
 
 		virtual void update(float pStep);
+		void OnCollision(Collider* other);
 
         //child management
 
