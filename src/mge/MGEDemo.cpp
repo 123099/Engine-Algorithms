@@ -68,29 +68,7 @@ void MGEDemo::_update(float deltaTime)
 	m_octree->Clear();
 
 	UpdateOcTree();
-
-	//Collisions
-	std::vector<GameObject*> retrieved;
-	for (int i = 0; i < _world->getChildCount(); ++i)
-	{
-		retrieved.clear();
-
-		GameObject* oneObject = _world->getChildAt(i);
-		m_octree->RetrieveObjectsInSpaceOf(retrieved, oneObject);
-
-		for (size_t j = 0; j < retrieved.size(); ++j)
-		{
-			GameObject* otherObject = retrieved[j];
-			if (oneObject != otherObject &&
-				oneObject->GetCollider() != nullptr &&
-				otherObject->GetCollider() != nullptr &&
-				oneObject->GetCollider()->IsColliding(otherObject->GetCollider()))
-			{
-				oneObject->OnCollision(otherObject->GetCollider());
-				otherObject->OnCollision(oneObject->GetCollider());
-			}
-		}
-	}
+	ProcessCollisions();
 
 	AbstractGame::_update(deltaTime);
 
@@ -179,6 +157,31 @@ void MGEDemo::UpdateOcTree()
 	const int childCount = _world->getChildCount();
 	for (int i = 0; i < childCount; ++i)
 		m_octree->Insert(_world->getChildAt(i));
+}
+
+void MGEDemo::ProcessCollisions()
+{
+	std::vector<GameObject*> retrieved;
+	for (int i = 0; i < _world->getChildCount(); ++i)
+	{
+		retrieved.clear();
+
+		GameObject* oneObject = _world->getChildAt(i);
+		m_octree->RetrieveObjectsInSpaceOf(retrieved, oneObject);
+
+		for (size_t j = 0; j < retrieved.size(); ++j)
+		{
+			GameObject* otherObject = retrieved[j];
+			if (oneObject != otherObject &&
+				oneObject->GetCollider() != nullptr &&
+				otherObject->GetCollider() != nullptr &&
+				oneObject->GetCollider()->IsColliding(otherObject->GetCollider()))
+			{
+				oneObject->OnCollision(otherObject->GetCollider());
+				otherObject->OnCollision(oneObject->GetCollider());
+			}
+		}
+	}
 }
 
 void MGEDemo::_updateHud() {

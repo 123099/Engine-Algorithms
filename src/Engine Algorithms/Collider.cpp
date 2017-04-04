@@ -51,7 +51,12 @@ bool Collider::CheckCollisionsOnObjectPlanes(Collider* one, Collider* other, con
 	//Check for overlap on the plane axes of each of the two objects
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		if (CheckOverlapOnPlane(one, other, onePlaneNormals[i]) == false || CheckOverlapOnPlane(one, other, otherPlaneNormals[i]) == false)
+		if (CheckOverlapOnPlane(one, other, onePlaneNormals[i]) == false)
+		{
+			return false;
+		}
+
+		if (CheckOverlapOnPlane(one, other, otherPlaneNormals[i]) == false)
 		{
 			return false;
 		}

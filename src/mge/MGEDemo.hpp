@@ -27,6 +27,7 @@ private:
 
 	void Test(unsigned objectCount);
 	void UpdateOcTree();
+	void ProcessCollisions();
     void _updateHud();
 
 	MGEDemo(const MGEDemo&) = delete;

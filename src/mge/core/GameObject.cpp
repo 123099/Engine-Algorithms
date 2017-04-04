@@ -7,9 +7,8 @@ using namespace std;
 #include "mge/behaviours/AbstractBehaviour.hpp"
 
 GameObject::GameObject(std::string pName, glm::vec3 pPosition ):
-	_name( pName ), m_localPosition(pPosition),
-    _parent(NULL), _children(), _mesh( NULL ),_behaviour( NULL ), _material(NULL),
-	m_bounds(glm::vec3(0.0f), glm::vec3(1.0f)), m_collider(nullptr) {}
+	_name( pName ), _parent(NULL), _children(), _mesh( NULL ),_behaviour( NULL ), _material(NULL),
+	m_bounds(glm::vec3(0.0f), glm::vec3(1.0f)), m_collider(nullptr) { setLocalPosition(pPosition); }
 
 GameObject::~GameObject()
 {
@@ -56,6 +55,9 @@ glm::mat3 GameObject::GetOrientation()
 void GameObject::setLocalPosition (glm::vec3 pPosition)
 {
 	m_localPosition = pPosition;
+
+	m_bounds.SetCenter(m_localPosition);
+	if (m_collider) m_collider->SetCenter(m_localPosition);
 }
 
 const glm::vec3& GameObject::getLocalPosition() const
@@ -204,9 +206,6 @@ void GameObject::update(float pStep)
     for (int i = _children.size()-1; i >= 0; --i ) {
         _children[i]->update(pStep);
     }
-
-	m_bounds.SetCenter(m_localPosition);
-	if(m_collider) m_collider->SetCenter(m_localPosition);
 }
 
 void GameObject::OnCollision(Collider * other)
