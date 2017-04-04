@@ -48,6 +48,11 @@ const glm::mat4& GameObject::getTransform()
     return _transform;
 }
 
+glm::mat3 GameObject::GetOrientation()
+{
+	return glm::mat3(_transform);
+}
+
 void GameObject::setLocalPosition (glm::vec3 pPosition)
 {
 	m_localPosition = pPosition;

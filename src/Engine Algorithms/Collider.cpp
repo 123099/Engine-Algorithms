@@ -78,7 +78,7 @@ bool Collider::CheckCollisionsOnObjectPlanes(Collider* one, Collider* other, con
 
 	return true;
 }
-
+/*
 bool Collider::CheckOverlapOnPlane(Collider* one, Collider* other, const glm::vec3 & planeNormal)
 {
 	//Get distance between the 2 centers of the colliders projected on the plane normal
@@ -93,12 +93,44 @@ bool Collider::CheckOverlapOnPlane(Collider* one, Collider* other, const glm::ve
 		std::abs(glm::dot(glm::vec3(oneExtents[0]), planeNormal)) +
 		std::abs(glm::dot(glm::vec3(oneExtents[1]), planeNormal)) +
 		std::abs(glm::dot(glm::vec3(oneExtents[2]), planeNormal));
-		//std::abs(glm::dot(glm::vec3(oneExtents[0]) + glm::vec3(oneExtents[1]) + glm::vec3(oneExtents[2]), planeNormal));
+		
 	const float radiusTwo = 
 		std::abs(glm::dot(glm::vec3(otherExtents[0]), planeNormal)) +
 		std::abs(glm::dot(glm::vec3(otherExtents[1]), planeNormal)) +
 		std::abs(glm::dot(glm::vec3(otherExtents[2]), planeNormal));
-		//std::abs(glm::dot(glm::vec3(otherExtents[0]) + glm::vec3(otherExtents[1]) + glm::vec3(otherExtents[2]), planeNormal));
+
+	return radiusOne + radiusTwo > centerDistance;
+}
+*/
+
+
+bool Collider::CheckOverlapOnPlane(Collider* one, Collider* other, const glm::vec3 & planeNormal)
+{
+	//Get distance between the 2 centers of the colliders projected on the plane normal
+	const float centerDistance = std::abs(glm::dot(other->GetBounds().GetCenter() - one->GetBounds().GetCenter(), planeNormal));
+
+	const glm::mat3 oneOrientation(one->m_gameObject->getTransform());
+	const glm::mat3 otherOrientation(other->m_gameObject->getTransform());
+
+	//Calculate the extents of the bounds, taking into consideration the orientation of the colliders
+	const glm::vec3 oneExtentsX = oneOrientation[0] * one->GetBounds().GetExtents().x;
+	const glm::vec3 oneExtentsY = oneOrientation[1] * one->GetBounds().GetExtents().y;
+	const glm::vec3 oneExtentsZ = oneOrientation[2] * one->GetBounds().GetExtents().z;
+
+	const glm::vec3 otherExtentsX = otherOrientation[0] * other->GetBounds().GetExtents().x;
+	const glm::vec3 otherExtentsY = otherOrientation[1] * other->GetBounds().GetExtents().y;
+	const glm::vec3 otherExtentsZ = otherOrientation[2] * other->GetBounds().GetExtents().z;
+
+	//Get the distance between the center of the objects and its maximum point projected on the plane normal
+	const float radiusOne =
+		std::abs(glm::dot(oneExtentsX, planeNormal)) +
+		std::abs(glm::dot(oneExtentsY, planeNormal)) +
+		std::abs(glm::dot(oneExtentsZ, planeNormal));
+
+	const float radiusTwo =
+		std::abs(glm::dot(otherExtentsX, planeNormal)) +
+		std::abs(glm::dot(otherExtentsY, planeNormal)) +
+		std::abs(glm::dot(otherExtentsZ, planeNormal));
 
 	return radiusOne + radiusTwo > centerDistance;
 }

@@ -30,6 +30,8 @@ class GameObject
 		void setTransform (const glm::mat4& pTransform);
         const glm::mat4& getTransform();
 
+		glm::mat3 GetOrientation();
+
         //access just the local position
 		void setLocalPosition (glm::vec3 pPosition);
 		const glm::vec3& getLocalPosition() const;
