@@ -34,9 +34,11 @@ using namespace std;
 #include "Engine Algorithms\AABB.hpp"
 #include "Engine Algorithms\OBB.hpp"
 
+#define OCTREE_SIZE 100.0f
+
 MGEDemo::MGEDemo()
 {
-	m_octree = new OcTreeFinal(0, glm::vec3(0.0f), glm::vec3(50.0f));
+	m_octree = new OcTreeFinal(0, glm::vec3(0.0f), glm::vec3(OCTREE_SIZE * 0.5f));
 	//m_octree = new OcTreeBase(0, glm::vec3(0.0f), glm::vec3(10.0f));
 }
 
@@ -128,11 +130,11 @@ void MGEDemo::Test(unsigned objectCount)
 	//SCENE SETUP
 	for (unsigned i = 0; i < objectCount; ++i)
 	{
-		glm::vec3 position = (glm::vec3((float)std::rand(), (float)std::rand(), (float)std::rand()) / glm::vec3(RAND_MAX) - glm::vec3(0.5f)) * 2.0f * 100.0f;
+		glm::vec3 position = (glm::vec3((float)std::rand(), (float)std::rand(), (float)std::rand()) / glm::vec3(RAND_MAX) - glm::vec3(0.5f)) * 2.0f * OCTREE_SIZE;
 		GameObject* teapot = new GameObject("teapot", position);
 		teapot->setMesh(teapotMeshS);
 		teapot->setMaterial(textureMaterial2);
-		teapot->setBehaviour(new BouncingMovement(100.0f));
+		teapot->setBehaviour(new BouncingMovement(OCTREE_SIZE));
 
 		//Make half objects have AABB collider, and half an OBB
 		if (i % 2 == 0)

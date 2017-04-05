@@ -38,37 +38,42 @@ bool Collider::IsColliding(AABB * one, AABB * other)
 
 bool Collider::IsColliding(AABB * one, OBB * other)
 {
-	return CheckCollisionsOnObjectPlanes(one, other, glm::mat3(), other->m_gameObject->getTransform());
+	return CheckCollisionsOnObjectPlanes(one, other, other->m_gameObject->getTransform());
 }
 
 bool Collider::IsColliding(OBB * one, OBB * other)
 {
-	return CheckCollisionsOnObjectPlanes(one, other, one->m_gameObject->getTransform(), other->m_gameObject->getTransform());
+	//Calculate the plane normals of other in the coordinate space of one and pass it on to the detection algorithm
+	return CheckCollisionsOnObjectPlanes(one, other, glm::inverse(one->m_gameObject->getTransform()) * other->m_gameObject->getTransform());
 }
 
-bool Collider::CheckCollisionsOnObjectPlanes(Collider* one, Collider* other, const glm::mat3 & onePlaneNormals, const glm::mat3 & otherPlaneNormals)
+bool Collider::CheckCollisionsOnObjectPlanes(Collider* one, Collider* other, const glm::mat3 & orientedPlaneNormals)
 {
-	//Check for overlap on the plane axes of each of the two objects
-	for (unsigned i = 0; i < 3; ++i)
-	{
-		if (CheckOverlapOnPlane(one, other, onePlaneNormals[i]) == false)
-		{
-			return false;
-		}
+	constexpr glm::vec3 aabbAxes[3] = { glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1) };
 
-		if (CheckOverlapOnPlane(one, other, otherPlaneNormals[i]) == false)
-		{
-			return false;
-		}
-	}
+	//Check for overlap on AABB axes
+	if (CheckOverlapOnPlane(one, other, aabbAxes[0]) == false)
+		return false;
+	if (CheckOverlapOnPlane(one, other, aabbAxes[1]) == false)
+		return false;
+	if (CheckOverlapOnPlane(one, other, aabbAxes[2]) == false)
+		return false;
+
+	//Check for overlap on OBB axes
+	if (CheckOverlapOnPlane(one, other, orientedPlaneNormals[0]) == false)
+		return false;
+	if (CheckOverlapOnPlane(one, other, orientedPlaneNormals[1]) == false)
+		return false;
+	if (CheckOverlapOnPlane(one, other, orientedPlaneNormals[2]) == false)
+		return false;
 
 	//Check for overlap on all the possible combinations of the axes of the two objects
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		const glm::vec3& oneAxis = onePlaneNormals[i];
+		const glm::vec3& oneAxis = aabbAxes[i];
 		for (unsigned j = 0; j < 3; ++j)
 		{
-			const glm::vec3 combinedPlaneAxis = glm::cross(oneAxis, otherPlaneNormals[j]);
+			const glm::vec3 combinedPlaneAxis = glm::cross(oneAxis, orientedPlaneNormals[j]);
 
 			//Only check for overlap if the two axes of the two objects are not similar, meaning that the normal of the plane is longer than 0.1 units
 			if (glm::length2(combinedPlaneAxis) >= 0.01f)
@@ -114,23 +119,16 @@ bool Collider::CheckOverlapOnPlane(Collider* one, Collider* other, const glm::ve
 	//Get distance between the 2 centers of the colliders projected on the plane normal
 	const float centerDistance = std::abs(glm::dot(other->GetBounds().GetCenter() - one->GetBounds().GetCenter(), planeNormal));
 
-	const glm::mat3 oneOrientation(one->m_gameObject->getTransform());
 	const glm::mat3 otherOrientation(other->m_gameObject->getTransform());
 
-	//Calculate the extents of the bounds, taking into consideration the orientation of the colliders
-	const glm::vec3 oneExtentsX = oneOrientation[0] * one->GetBounds().GetExtents().x;
-	const glm::vec3 oneExtentsY = oneOrientation[1] * one->GetBounds().GetExtents().y;
-	const glm::vec3 oneExtentsZ = oneOrientation[2] * one->GetBounds().GetExtents().z;
-
+	//Calculate the extents of the bounds, taking into consideration the orientation of object b
 	const glm::vec3 otherExtentsX = otherOrientation[0] * other->GetBounds().GetExtents().x;
 	const glm::vec3 otherExtentsY = otherOrientation[1] * other->GetBounds().GetExtents().y;
 	const glm::vec3 otherExtentsZ = otherOrientation[2] * other->GetBounds().GetExtents().z;
 
 	//Get the distance between the center of the objects and its maximum point projected on the plane normal
 	const float radiusOne =
-		std::abs(glm::dot(oneExtentsX, planeNormal)) +
-		std::abs(glm::dot(oneExtentsY, planeNormal)) +
-		std::abs(glm::dot(oneExtentsZ, planeNormal));
+		glm::dot(one->GetBounds().GetExtents(), glm::abs(planeNormal));
 
 	const float radiusTwo =
 		std::abs(glm::dot(otherExtentsX, planeNormal)) +
