@@ -34,7 +34,7 @@ using namespace std;
 #include "Engine Algorithms\AABB.hpp"
 #include "Engine Algorithms\OBB.hpp"
 
-#define OCTREE_SIZE 100.0f
+#define OCTREE_SIZE 2500.0f
 
 MGEDemo::MGEDemo()
 {
@@ -170,7 +170,7 @@ void MGEDemo::ProcessCollisions()
 
 		GameObject* oneObject = _world->getChildAt(i);
 		m_octree->RetrieveObjectsInSpaceOf(retrieved, oneObject);
-
+		//std::cout << retrieved.size() << '\n';
 		for (size_t j = 0; j < retrieved.size(); ++j)
 		{
 			GameObject* otherObject = retrieved[j];
