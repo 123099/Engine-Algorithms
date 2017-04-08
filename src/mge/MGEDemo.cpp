@@ -188,11 +188,11 @@ void MGEDemo::ProcessCollisions()
 				//If the collision wasn't processed before, check for collision
 				if (oneCollider && otherCollider)
 				{
-					auto& oneProcessedColliders = m_processedCollisionPairs[oneCollider];
-					auto& otherProcessedColliders = m_processedCollisionPairs[otherCollider];
+					//auto& oneProcessedColliders = m_processedCollisionPairs[oneCollider];
+					//auto& otherProcessedColliders = m_processedCollisionPairs[otherCollider];
 
-					if (oneProcessedColliders.find(otherCollider) == oneProcessedColliders.end() && otherProcessedColliders.find(oneCollider) == otherProcessedColliders.end())
-					{
+					//if (oneProcessedColliders.find(otherCollider) == oneProcessedColliders.end() && otherProcessedColliders.find(oneCollider) == otherProcessedColliders.end())
+					//{
 						if (oneCollider->IsColliding(otherCollider))
 						{
 							oneObject->OnCollision(otherCollider);
@@ -200,15 +200,15 @@ void MGEDemo::ProcessCollisions()
 						}
 
 						//Remember the processed pair
-						m_processedCollisionPairs[oneCollider].emplace(otherCollider);
-					}
+						//m_processedCollisionPairs[oneCollider].emplace(otherCollider);
+					//}
 				}
 			}
 		}
 	}
 
 	//Clear all processed pairs for next frame
-	m_processedCollisionPairs.clear();
+	//m_processedCollisionPairs.clear();
 
 	//std::cout << "Collision count - " << count << '\n';
 }
