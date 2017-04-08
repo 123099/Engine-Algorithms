@@ -173,6 +173,7 @@
     <ClInclude Include="..\src\Engine Algorithms\AABB.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\Bounds.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\Collider.hpp" />
+    <ClInclude Include="..\src\Engine Algorithms\CollisionPair.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\OBB.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\OcTreeBase.hpp" />
     <ClInclude Include="..\src\Engine Algorithms\OcTreeFinal.hpp" />

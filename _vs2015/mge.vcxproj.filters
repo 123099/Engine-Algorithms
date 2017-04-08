@@ -109,6 +109,9 @@
     <ClInclude Include="..\src\Engine Algorithms\AABB.hpp">
       <Filter>MGE Source files\Engine Algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Engine Algorithms\CollisionPair.hpp">
+      <Filter>MGE Source files\Engine Algorithms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">

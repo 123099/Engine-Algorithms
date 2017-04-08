@@ -3,6 +3,8 @@
 
 #include <mge/core/AbstractGame.hpp>
 #include "Engine Algorithms\OcTreeImpl.hpp"
+#include "Engine Algorithms\CollisionPair.hpp"
+#include <vector>
 
 class DebugHud;
 
@@ -24,6 +26,8 @@ protected:
 private:
 	DebugHud* m_hud;
 	OcTreeImpl* m_octree;
+	std::vector<GameObject*> m_collisionsRetrieved;
+	std::vector<CollisionPair> m_processedCollisionPairs;
 
 	void Test(unsigned objectCount);
 	void UpdateOcTree();

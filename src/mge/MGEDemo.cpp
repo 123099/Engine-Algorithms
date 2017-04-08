@@ -34,7 +34,7 @@ using namespace std;
 #include "Engine Algorithms\AABB.hpp"
 #include "Engine Algorithms\OBB.hpp"
 
-#define OCTREE_SIZE 2500.0f
+#define OCTREE_SIZE 2500
 
 MGEDemo::MGEDemo()
 {
@@ -58,7 +58,7 @@ void MGEDemo::_initializeScene()
 {
     _renderer->setClearColor(0,0,0);
 
-	Test(2500);
+	Test(10000);
 }
 
 float timePassed = 0.0f;
@@ -102,7 +102,7 @@ void MGEDemo::_update(float deltaTime)
 
 void MGEDemo::_render() {
     AbstractGame::_render();
-	//m_octree->Draw(glm::inverse(_world->getMainCamera()->getWorldTransform()), _world->getMainCamera()->getProjection());
+	m_octree->Draw(glm::inverse(_world->getMainCamera()->getWorldTransform()), _world->getMainCamera()->getProjection());
     _updateHud();
 }
 
@@ -163,27 +163,50 @@ void MGEDemo::UpdateOcTree()
 
 void MGEDemo::ProcessCollisions()
 {
-	std::vector<GameObject*> retrieved;
+	int count = 0;
 	for (int i = 0; i < _world->getChildCount(); ++i)
 	{
-		retrieved.clear();
+		//Clear Retrieved list
+		m_collisionsRetrieved.clear();
 
+		//Retrieve all potential collision for a game object
 		GameObject* oneObject = _world->getChildAt(i);
-		m_octree->RetrieveObjectsInSpaceOf(retrieved, oneObject);
-		//std::cout << retrieved.size() << '\n';
-		for (size_t j = 0; j < retrieved.size(); ++j)
+		m_octree->RetrieveObjectsInSpaceOf(m_collisionsRetrieved, oneObject);
+
+		//Go through all possible collisions
+		const size_t retrievedCount = m_collisionsRetrieved.size();
+		for (size_t j = 0; j < retrievedCount; ++j)
 		{
-			GameObject* otherObject = retrieved[j];
-			if (oneObject != otherObject &&
-				oneObject->GetCollider() != nullptr &&
-				otherObject->GetCollider() != nullptr &&
-				oneObject->GetCollider()->IsColliding(otherObject->GetCollider()))
+			GameObject* otherObject = m_collisionsRetrieved[j];
+
+			//If the objects are different, process collision
+			if (oneObject != otherObject)
 			{
-				oneObject->OnCollision(otherObject->GetCollider());
-				otherObject->OnCollision(oneObject->GetCollider());
+				//Retrieve the colliders of the objects
+				Collider* oneCollider = oneObject->GetCollider();
+				Collider* otherCollider = otherObject->GetCollider();
+
+				//If the collision wasn't processed before, check for collision
+				if (oneCollider && otherCollider && std::find(m_processedCollisionPairs.begin(), m_processedCollisionPairs.end(), CollisionPair(oneCollider, otherCollider)) == m_processedCollisionPairs.end())
+				{
+					++count;
+					if (oneCollider->IsColliding(otherCollider))
+					{
+						oneObject->OnCollision(otherCollider);
+						otherObject->OnCollision(oneCollider);
+					}
+
+					//Remember the processed pair
+					m_processedCollisionPairs.push_back(CollisionPair(oneCollider, otherCollider));
+				}
 			}
 		}
 	}
+
+	//Clear all processed pairs for next frame
+	m_processedCollisionPairs.clear();
+
+	//std::cout << "Collision count - " << count << '\n';
 }
 
 void MGEDemo::_updateHud() {
