@@ -163,7 +163,6 @@ void MGEDemo::UpdateOcTree()
 
 void MGEDemo::ProcessCollisions()
 {
-	int count = 0;
 	for (int i = 0; i < _world->getChildCount(); ++i)
 	{
 		//Clear Retrieved list
@@ -187,17 +186,22 @@ void MGEDemo::ProcessCollisions()
 				Collider* otherCollider = otherObject->GetCollider();
 
 				//If the collision wasn't processed before, check for collision
-				if (oneCollider && otherCollider && std::find(m_processedCollisionPairs.begin(), m_processedCollisionPairs.end(), CollisionPair(oneCollider, otherCollider)) == m_processedCollisionPairs.end())
+				if (oneCollider && otherCollider)
 				{
-					++count;
-					if (oneCollider->IsColliding(otherCollider))
-					{
-						oneObject->OnCollision(otherCollider);
-						otherObject->OnCollision(oneCollider);
-					}
+					auto& oneProcessedColliders = m_processedCollisionPairs[oneCollider];
+					auto& otherProcessedColliders = m_processedCollisionPairs[otherCollider];
 
-					//Remember the processed pair
-					m_processedCollisionPairs.push_back(CollisionPair(oneCollider, otherCollider));
+					if (oneProcessedColliders.find(otherCollider) == oneProcessedColliders.end() && otherProcessedColliders.find(oneCollider) == otherProcessedColliders.end())
+					{
+						if (oneCollider->IsColliding(otherCollider))
+						{
+							oneObject->OnCollision(otherCollider);
+							otherObject->OnCollision(oneCollider);
+						}
+
+						//Remember the processed pair
+						m_processedCollisionPairs[oneCollider].emplace(otherCollider);
+					}
 				}
 			}
 		}
