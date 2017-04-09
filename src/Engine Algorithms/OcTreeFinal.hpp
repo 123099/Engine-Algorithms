@@ -25,7 +25,7 @@ public:
 	(const glm::mat4& viewMat, const glm::mat4& projectionMat) override final;			//Draws the tree for debugging
 	std::string ToString() override final;												//Returns a string with all the nodes and the amount of objects they have
 private:
-	static const unsigned MAX_LAYERS = 5;												//Maximum number of layers the tree will split into
+	static const unsigned MAX_LAYERS = 9;												//Maximum number of layers the tree will split into
 	static const unsigned MAX_OBJECTS = 5;												//Maximum number of objects per layer until it splits
 
 	static Mesh* m_debugMesh;															//Drawable mesh used for debug drawing the tree
