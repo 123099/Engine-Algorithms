@@ -8,6 +8,7 @@ public:
 	BouncingMovement(float range);
 
 	void update(float deltaTime) override final;
+	void OnCollision(Collider* other) override final;
 private:
 	float m_range;
 	glm::vec3 m_movementDirection;

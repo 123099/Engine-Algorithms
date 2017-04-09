@@ -29,14 +29,17 @@ using namespace std;
 #include "mge/MGEDemo.hpp"
 
 #include "Engine Algorithms\OcTreeBase.hpp"
+#include "Engine Algorithms\OcTreeFinal.hpp"
+
+#include "Engine Algorithms\AABB.hpp"
+#include "Engine Algorithms\OBB.hpp"
+
+#define OCTREE_SIZE 2500
 
 MGEDemo::MGEDemo()
 {
-#ifdef FINAL_DEMO
-	m_octree = new OcTreeFinal(0, glm::vec3(0.0f), glm::vec3(10.0f));
-#else
-	m_octree = new OcTreeBase(0, glm::vec3(0.0f), glm::vec3(10.0f));
-#endif
+	m_octree = new OcTreeFinal(0, glm::vec3(0.0f), glm::vec3(OCTREE_SIZE * 0.5f));
+	//m_octree = new OcTreeBase(0, glm::vec3(0.0f), glm::vec3(10.0f));
 }
 
 void MGEDemo::initialize() 
@@ -55,7 +58,7 @@ void MGEDemo::_initializeScene()
 {
     _renderer->setClearColor(0,0,0);
 
-	Test(1000);
+	Test(2500);
 }
 
 float timePassed = 0.0f;
@@ -67,11 +70,7 @@ void MGEDemo::_update(float deltaTime)
 	m_octree->Clear();
 
 	UpdateOcTree();
-
-	std::vector<GameObject*> retrieved;
-	//Fake collision loop
-	for (int i = 0; i < _world->getChildCount(); ++i)
-		m_octree->RetrieveObjectsInSpaceOf(retrieved, _world->getChildAt(i));
+	ProcessCollisions();
 
 	AbstractGame::_update(deltaTime);
 
@@ -112,10 +111,11 @@ void MGEDemo::Test(unsigned objectCount)
 	std::cout << "Starting testset " << objectCount << '\n';
 
 	//add camera first (it will be updated last)
-	Camera* camera = new Camera("camera", glm::vec3(0, 40, 40));
+	Camera* camera = new Camera("camera", glm::vec3(0, 150, 150));
 	camera->rotate(glm::radians(-40.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	FreeLookCamera* fc = new FreeLookCamera(*_window);
-	fc->SetMoveSpeed(2);
+	fc->SetMoveSpeed(4);
+	fc->SetRotationSpeed(0.005f);
 	camera->setBehaviour(fc);
 	_world->add(camera);
 	_world->setMainCamera(camera);
@@ -130,10 +130,22 @@ void MGEDemo::Test(unsigned objectCount)
 	//SCENE SETUP
 	for (unsigned i = 0; i < objectCount; ++i)
 	{
-		GameObject* teapot = new GameObject("teapot", glm::vec3(-3, 1.2f, 1));
+		glm::vec3 position = (glm::vec3((float)std::rand(), (float)std::rand(), (float)std::rand()) / glm::vec3(RAND_MAX) - glm::vec3(0.5f)) * 2.0f * OCTREE_SIZE;
+		GameObject* teapot = new GameObject("teapot", position);
 		teapot->setMesh(teapotMeshS);
 		teapot->setMaterial(textureMaterial2);
-		teapot->setBehaviour(new BouncingMovement(20.0f));
+		teapot->setBehaviour(new BouncingMovement(OCTREE_SIZE));
+
+		//Make half objects have AABB collider, and half an OBB
+		if (i % 2 == 0)
+		{
+			teapot->SetCollider(new AABB(glm::vec3(0.5f)));
+		}
+		else
+		{
+			teapot->SetCollider(new OBB(glm::vec3(0.5f)));
+		}
+
 		_world->add(teapot);
 	}
 
@@ -147,6 +159,58 @@ void MGEDemo::UpdateOcTree()
 	const int childCount = _world->getChildCount();
 	for (int i = 0; i < childCount; ++i)
 		m_octree->Insert(_world->getChildAt(i));
+}
+
+void MGEDemo::ProcessCollisions()
+{
+	for (int i = 0; i < _world->getChildCount(); ++i)
+	{
+		//Clear Retrieved list
+		m_collisionsRetrieved.clear();
+
+		//Retrieve all potential collision for a game object
+		GameObject* oneObject = _world->getChildAt(i);
+		m_octree->RetrieveObjectsInSpaceOf(m_collisionsRetrieved, oneObject);
+
+		//Go through all possible collisions
+		const size_t retrievedCount = m_collisionsRetrieved.size();
+		for (size_t j = 0; j < retrievedCount; ++j)
+		{
+			GameObject* otherObject = m_collisionsRetrieved[j];
+
+			//If the objects are different, process collision
+			if (oneObject != otherObject)
+			{
+				//Retrieve the colliders of the objects
+				Collider* oneCollider = oneObject->GetCollider();
+				Collider* otherCollider = otherObject->GetCollider();
+
+				//If the collision wasn't processed before, check for collision
+				if (oneCollider && otherCollider)
+				{
+					//auto& oneProcessedColliders = m_processedCollisionPairs[oneCollider];
+					//auto& otherProcessedColliders = m_processedCollisionPairs[otherCollider];
+
+					//if (oneProcessedColliders.find(otherCollider) == oneProcessedColliders.end() && otherProcessedColliders.find(oneCollider) == otherProcessedColliders.end())
+					//{
+						if (oneCollider->IsColliding(otherCollider))
+						{
+							oneObject->OnCollision(otherCollider);
+							otherObject->OnCollision(oneCollider);
+						}
+
+						//Remember the processed pair
+						//m_processedCollisionPairs[oneCollider].emplace(otherCollider);
+					//}
+				}
+			}
+		}
+	}
+
+	//Clear all processed pairs for next frame
+	//m_processedCollisionPairs.clear();
+
+	//std::cout << "Collision count - " << count << '\n';
 }
 
 void MGEDemo::_updateHud() {

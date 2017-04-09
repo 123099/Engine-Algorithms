@@ -100,6 +100,18 @@
     <ClInclude Include="..\src\Engine Algorithms\OcTreeFinal.hpp">
       <Filter>MGE Source files\Engine Algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Engine Algorithms\Collider.hpp">
+      <Filter>MGE Source files\Engine Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine Algorithms\OBB.hpp">
+      <Filter>MGE Source files\Engine Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine Algorithms\AABB.hpp">
+      <Filter>MGE Source files\Engine Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine Algorithms\CollisionPair.hpp">
+      <Filter>MGE Source files\Engine Algorithms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -169,6 +181,15 @@
       <Filter>MGE Source files\Engine Algorithms</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Engine Algorithms\OcTreeFinal.cpp">
+      <Filter>MGE Source files\Engine Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine Algorithms\Collider.cpp">
+      <Filter>MGE Source files\Engine Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine Algorithms\OBB.cpp">
+      <Filter>MGE Source files\Engine Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine Algorithms\AABB.cpp">
       <Filter>MGE Source files\Engine Algorithms</Filter>
     </ClCompile>
   </ItemGroup>

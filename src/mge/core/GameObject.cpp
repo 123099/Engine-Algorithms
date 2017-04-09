@@ -6,9 +6,9 @@ using namespace std;
 #include "mge/core/Mesh.hpp"
 #include "mge/behaviours/AbstractBehaviour.hpp"
 
-GameObject::GameObject(std::string pName, glm::vec3 pPosition )
-:	_name( pName ), m_localPosition(pPosition),
-    _parent(NULL), _children(), _mesh( NULL ),_behaviour( NULL ), _material(NULL), m_bounds(glm::vec3(0.0f), glm::vec3(1.0f)) {}
+GameObject::GameObject(std::string pName, glm::vec3 pPosition ):
+	_name( pName ), _parent(NULL), _children(), _mesh( NULL ),_behaviour( NULL ), _material(NULL),
+	m_bounds(glm::vec3(0.0f), glm::vec3(1.0f)), m_collider(nullptr) { setLocalPosition(pPosition); }
 
 GameObject::~GameObject()
 {
@@ -22,6 +22,8 @@ GameObject::~GameObject()
     }
 
     //do not forget to delete behaviour, material, mesh, collider manually if required!
+	delete _behaviour;
+	delete m_collider;
 }
 
 void GameObject::setName (std::string pName)
@@ -45,9 +47,17 @@ const glm::mat4& GameObject::getTransform()
     return _transform;
 }
 
+glm::mat3 GameObject::GetOrientation()
+{
+	return glm::mat3(_transform);
+}
+
 void GameObject::setLocalPosition (glm::vec3 pPosition)
 {
 	m_localPosition = pPosition;
+
+	m_bounds.SetCenter(m_localPosition);
+	if (m_collider) m_collider->SetCenter(m_localPosition);
 }
 
 const glm::vec3& GameObject::getLocalPosition() const
@@ -84,6 +94,22 @@ void GameObject::setBehaviour(AbstractBehaviour* pBehaviour)
 AbstractBehaviour * GameObject::getBehaviour() const
 {
     return _behaviour;
+}
+
+void GameObject::SetCollider(Collider * collider)
+{
+	if (m_collider != nullptr)
+	{
+		m_collider->SetGameObject(nullptr);
+	}
+
+	m_collider = collider;
+	m_collider->SetGameObject(this);
+}
+
+Collider * GameObject::GetCollider() const
+{
+	return m_collider;
 }
 
 void GameObject::setParent (GameObject* pParent) {
@@ -180,6 +206,14 @@ void GameObject::update(float pStep)
     for (int i = _children.size()-1; i >= 0; --i ) {
         _children[i]->update(pStep);
     }
+}
+
+void GameObject::OnCollision(Collider * other)
+{
+	if (_behaviour)
+	{
+		_behaviour->OnCollision(other);
+	}
 }
 
 int GameObject::getChildCount() {

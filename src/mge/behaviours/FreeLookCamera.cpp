@@ -92,13 +92,12 @@ void FreeLookCamera::Move(float deltaTime)
 	}
 
 	//If no movement input is given, reset the acceleration clock and do nothing
-	if (glm::dot(movement, movement) == 0.0)
+	if (glm::length2(movement) < 0.001f)
 	{
 		m_accelerationClock.restart();
 		return;
 	}
-	_owner->setTransform(
-		glm::translate(movement * (m_moveSpeed + m_accelerationClock.getElapsedTime().asSeconds() * 5.0f) * deltaTime) *
-		_owner->getTransform()
+	_owner->translate(
+		movement * (m_moveSpeed + m_accelerationClock.getElapsedTime().asSeconds() * 5.0f) * deltaTime
 	);
 }

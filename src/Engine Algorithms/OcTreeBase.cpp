@@ -188,7 +188,7 @@ int OcTreeBase::GetNodeIndex(GameObject * gameObject)
 	//If the object is exactly on one of the edges of this node, then it doesn't fit in any child node
 	const Bounds& objectBounds = gameObject->GetBounds();
 	const glm::vec3& objectExtents = objectBounds.GetExtents();
-	const glm::vec3& objectPosition = gameObject->getLocalPosition() + objectBounds.GetCenter();
+	const glm::vec3& objectPosition = objectBounds.GetCenter();
 	const glm::vec3& nodeCenter = m_bounds.GetCenter();
 
 	const bool isInLeftHalf = objectPosition.x + objectExtents.x < nodeCenter.x;
